@@ -1,0 +1,11 @@
+language: node_js
+node_js: node
+services:
+- mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: E+YbHTdk+R5o8pW2jmDPtlkyChTHz7sTxQyVwRFn/WpigZscz+BoCZsxoBHRSbkhw89snneQpVGecwWcUpTn5z2PBQaDo8j3o1wDER1IcKAZ2iFtAdW3OENmfZWaGa6hnfkmJtG3HklBl5CS36KgG3rc76Nnjkl/+CLFIaiHHXdpTV2Nesk7lb1L2gGYgVYmSPosSauiQhXVt5fc/chuYyHwZgEpgMRb9uktL+iOJyO5FjCLNTHF5dBdJ5qGFKKXTT1wBxhGMFdAGlnVJE6BRs0cGWXUEUmatdBvpoz4k1s+EjRIiUkpqLwOfNuYshLC7/wo7nMhyla9wT4KHlJ+5XDAs0+MXJMExuRAqChYoCf2u1QAV7NzoiuYAu88noiiV2nd8+i0wB25qDV5nHvlyxdYSEgArhucJpy0qY+2QEqq9x6SA3YJeBbJEqZu+1e0PAJiln3p14Zal+RdxZLEEWEqE/mcEXR9O5ygi39UqFglrgF6djSHYRKDuhd99PCm2V5akZfj1Db/k7L9oaFiSU01jVlzsj0P2mBKBnAGwwftkaqvGnGoZoSybC6g509I72Ot+qH6BCIKUcZW5sKvNhPEj4tbp/7d1yWkYShmMNtgasB5z4BE8IibwA0q/VaC7H5uTX7LfBPukrpjnYE4765/VeVaZdyC8OKGMnrvteA=
+  app: https://secure-retreat-61884.herokuapp.com/
+  on:
+    repo: rohinieravi/stock-tracker-api

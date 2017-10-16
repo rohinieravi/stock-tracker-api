@@ -78,7 +78,6 @@ app.get('/api/stocks/search/:keyword', (req, res) => {
 app.put('/api/stocks/addcompany', (req, res) => {
   
     const field = 'username';
-    console.log(req);
     if (!(field in req.body)) {
       const message = `Missing ${field} in request body`
       console.error(message);

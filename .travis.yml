@@ -2,3 +2,10 @@ language: node_js
 node_js: node
 services:
 - mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: fcDpsCLyPdlRYUbNgQQwNlgP3I2JYnIV5eTlK9BK5BQhfyIvTvW+rY5KAUE/e8fpidnKE8gAt7NjqD2Bwz0ezH7I4b+g089rxzLGIsScbC5uwcCDi2qB6d8lvio4McDZS375d4L+A/JVMWBaBNQ0v1sRASTlQOA41sBfVDL0VgjEvkIsPnkasKhwVRgxvzV7cg3PdYDJs9MrW2UN46KX1Udzh+wvEXHj8D9rNZWuNDuVcQVENrMMmCfzXEvKZ76CoMsTLiWZrqbkpo3MbwIej8SYTzX8zK7nKlyUWeGUoStps5UCCs3gmYHTWGqq8C3zNjybbwgw+RLrBcm9BNOngPO9lfEsmmwu1gwy23xTwZ5MB/k14Syv2pssA6zWXonRDCjUQE38c4pbC39U2lFwgc2rvwKo+QNW8/+QY4vidUzdEPwK1EbcYscKceNLz6dqmVIX/Dn1jOBiU0aHZMkFmtaAgq8xDLuM/Coi7KaF+D/9GJ4gAx7Mw6N/VMWKJZt9x6twaLzTqj9Sl1D4ALCIcnPb8iAFX+2P2lhcAs9TOjeRsCk6VKmnnkqNpmR8MLltTAWGWu9O+b807XVnAIIe1S2E1/dE+Cuq7/xpHMjz08HskDO7ILRxjqem6tmwl1rWoPxOo3uaqKC6BfFkhcSkkA1xFEnLqX6PdqDqUL2TY0U=
+  app: peaceful-sea-42370
+  on:
+    repo: rohinieravi/stock-tracker-api

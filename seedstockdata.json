@@ -1,0 +1,1 @@
+{"username": "demo@hi.com", "password": "123", "user": {"firstName": "demo", "lastName": "user"}, "stocks": [{"symbol": "AMZN", "units":20}, {"symbol":"MSFT", "units":10}]}

@@ -1,38 +1,147 @@
 const express = require('express');
 const app = express();
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const {CLIENT_ORIGIN, DATABASE_URL, PORT, API_BASE_URL, HEADERS} = require('./config');
+const {Stock} = require('./models');
+const request = require('request');
 
-//const PORT = process.env.PORT || 3000;
 
-app.get('/api/*', (req, res) => {
-res.json({ok: true});
+app.use(express.static('public'));
+app.use(morgan('common'));
+app.use(bodyParser.json());
+
+mongoose.Promise = global.Promise;
+
+app.use(
+    cors({
+        origin: CLIENT_ORIGIN
+    })
+);
+
+app.get('/api/stocks/:username', (req, res) => {
+  Stock
+    .find({username: req.params.username})
+    .exec()
+    .then(items => {
+      res.json(items.map(item =>item.apiRepr()));
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({error: 'something went terribly wrong'});
+    });
 });
 
-//app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+
+app.get('/api/stocks/quotes/:symbol', (req, res) => {
+  if (!req.params.symbol) { 
+    res.status(500); 
+    res.send({"Error": "Missing symbol"}); 
+  } 
+  request.get({ 
+      url: API_BASE_URL +'/quotes' ,
+      qs: {
+        symbols: req.params.symbol,
+      },
+      headers: HEADERS
+     },  function(error, response, body) { 
+          if (!error && response.statusCode == 200) { 
+              res.set('Content-Type', 'application/json');
+              res.send(body);
+          } 
+        }
+  )
+}); 
+
+app.get('/api/stocks/search/:keyword', (req, res) => {
+  if (!req.params.keyword) {
+    console.log("here");
+    res.status(500);
+    res.send({"Error": "Missing keyword"});
+  }
+  request.get({
+    url: API_BASE_URL + '/search',
+    qs: {
+      q: req.params.keyword
+    },
+    headers: HEADERS
+  }, function(error, response, body) {
+      if(!error && response.statusCode == 200) {
+        res.set('Content-Type', 'application/json');
+        res.send(body);
+      }
+  });
+});
+
+app.put('/api/stocks/addcompany', (req, res) => {
+  
+    const field = 'username';
+    if (!(field in req.body)) {
+      const message = `Missing ${field} in request body`
+      console.error(message);
+      return res.status(400).send(message);
+    }
+  
+   Stock
+    .findOneAndUpdate({username: req.body.username}, {$push:{stocks: req.body.stock}},{new: true})
+    .exec()
+    .then(stock => res.json(stock.apiRepr()))
+    .catch(err => res.status(500).json({message: 'Internal server error'}));
+});
+
+
+app.put('/api/stocks/editUnits', (req, res) => {
+  const requiredFields = ['username', 'symbol'];
+  for (let i=0; i<requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (!(field in req.body)) {
+      const message = `Missing ${field} in request body`
+      console.error(message);
+      return res.status(400).send(message);
+    }
+  }
+  Stock.update({'username': req.body.username,'stocks.symbol': req.body.symbol}, 
+    {$set: {'stocks.$.units': req.body.units}})
+  .exec()
+  .then(stock => res.status(204).end())
+  .catch(err => res.status(500).json({message: 'Internal server error'}));
+});
+
 
 let server;
 
-function runServer() {
-  const port = process.env.PORT || 8040;
+
+function runServer(databaseUrl=DATABASE_URL, port=PORT) {
   return new Promise((resolve, reject) => {
-    server = app.listen(port, () => {
-      console.log(`Your app is listening on port ${port}`);
-      resolve(server);
-    }).on('error', err => {
-      reject(err)
+    mongoose.connect(databaseUrl, err => {
+      if (err) {
+        return reject(err);
+      }
+      server = app.listen(port, () => {
+        console.log(`Your app is listening on port ${port}`);
+        resolve();
+      })
+      .on('error', err => {
+        mongoose.disconnect();
+        reject(err);
+      });
     });
   });
 }
 
 function closeServer() {
-  return new Promise((resolve, reject) => {
-    console.log('Closing server');
-    server.close(err => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve();
-    });
+  return mongoose.disconnect().then(() => {
+     return new Promise((resolve, reject) => {
+       console.log('Closing server');
+       server.close(err => {
+           if (err) {
+               return reject(err);
+           }
+           resolve();
+       });
+     });
   });
 }
 
@@ -41,4 +150,3 @@ if (require.main === module) {
 };
 
 module.exports = {app, runServer, closeServer};
-

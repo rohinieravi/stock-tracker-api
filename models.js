@@ -1,11 +1,15 @@
+const bcrypt = require('bcryptjs');
+
 const mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
+
 
 const stockSchema = mongoose.Schema({
   username: {type: String, required: true},
   password: {type: String, required: true},
   user:{
-    firstName: {type:String},
-    lastName: {type: String}
+    firstName: {type:String, default:""},
+    lastName: {type: String, default:""}
    },
   stocks: [{
     symbol: String,

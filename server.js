@@ -7,6 +7,10 @@ const cors = require('cors');
 const {CLIENT_ORIGIN, DATABASE_URL, PORT, API_BASE_URL, HEADERS} = require('./config');
 const {Stock} = require('./models');
 const request = require('request');
+const userRouter = require('./userRouter');
+const authRouter = require('./authRouter');
+const {basicStrategy, jwtStrategy} = require('./strategies');
+const passport = require('passport');
 
 
 app.use(express.static('public'));
@@ -21,7 +25,17 @@ app.use(
     })
 );
 
-app.get('/api/stocks/:username', (req, res) => {
+app.use(passport.initialize());
+passport.use(basicStrategy);
+passport.use(jwtStrategy);
+
+app.use('/api/users/', userRouter);
+app.use('/api/auth/', authRouter);
+
+
+app.get('/api/stocks/:username', 
+      passport.authenticate('jwt', {session: false}),
+      (req, res) => {
   Stock
     .find({username: req.params.username})
     .exec()
@@ -35,7 +49,9 @@ app.get('/api/stocks/:username', (req, res) => {
 });
 
 
-app.get('/api/stocks/quotes/:symbol', (req, res) => {
+app.get('/api/stocks/quotes/:symbol',
+    passport.authenticate('jwt', {session: false}), 
+    (req, res) => {
   if (!req.params.symbol) { 
     res.status(500); 
     res.send({"Error": "Missing symbol"}); 
@@ -55,9 +71,10 @@ app.get('/api/stocks/quotes/:symbol', (req, res) => {
   )
 }); 
 
-app.get('/api/stocks/search/:keyword', (req, res) => {
+app.get('/api/stocks/search/:keyword',
+     passport.authenticate('jwt', {session: false}),
+     (req, res) => {
   if (!req.params.keyword) {
-    console.log("here");
     res.status(500);
     res.send({"Error": "Missing keyword"});
   }
@@ -75,7 +92,9 @@ app.get('/api/stocks/search/:keyword', (req, res) => {
   });
 });
 
-app.put('/api/stocks/addcompany', (req, res) => {
+app.put('/api/stocks/addcompany',
+    passport.authenticate('jwt', {session: false}),
+    (req, res) => {
   
     const field = 'username';
     if (!(field in req.body)) {
@@ -92,7 +111,9 @@ app.put('/api/stocks/addcompany', (req, res) => {
 });
 
 
-app.put('/api/stocks/editUnits', (req, res) => {
+app.put('/api/stocks/editUnits',
+    passport.authenticate('jwt', {session: false}),
+    (req, res) => {
   const requiredFields = ['username', 'symbol'];
   for (let i=0; i<requiredFields.length; i++) {
     const field = requiredFields[i];
@@ -107,6 +128,10 @@ app.put('/api/stocks/editUnits', (req, res) => {
   .exec()
   .then(stock => res.status(204).end())
   .catch(err => res.status(500).json({message: 'Internal server error'}));
+});
+
+app.use('*', (req, res) => {
+  return res.status(404).json({message: 'Not Found'});
 });
 
 

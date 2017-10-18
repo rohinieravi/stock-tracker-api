@@ -3,40 +3,41 @@ const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
 const {Stock} = require('../models');
 const faker = require('faker');
-const {TEST_DATABASE_URL} = require('../config');
-
+const {TEST_DATABASE_URL, JWT_SECRET} = require('../config');
+const jwt = require('jsonwebtoken');
 const {app, runServer, closeServer} = require('../server');
 
 const should = chai.should();
 chai.use(chaiHttp);
 
 
-function seedStockData(){
+/*function seedStockData(){
 	const seedData = [];
   	for (let i=1; i<=10; i++) {
     	seedData.push(generateStockData());
   	}
   	return Stock.insertMany(seedData);
-}
+}*/
 
-function generateStockData() {
-	return {
-		username: faker.internet.email(),
-		password: faker.name.firstName(),
-		user: {
-			firstName: faker.name.firstName(),
-			lastName: faker.name.lastName(),
-		},
-		stocks: [{
+//function generateStockData() {
+	//return {
+const username = faker.internet.email();
+const password = "examplePassword";
+const user = {
+	firstName: faker.name.firstName(),
+	lastName: faker.name.lastName(),
+};
+		
+const stocks = [{
 			symbol: "AMZN",
 			units: faker.random.number()
 		},
 		{
 			symbol: "TSLA",
 			units: faker.random.number()
-		}]
-	}
-}
+		}];
+	
+
 
 function tearDownDb() {
     console.warn('Deleting database');
@@ -49,7 +50,14 @@ describe('Stock Tracker API', function() {
 	});
 
 	beforeEach(function() {
-    return seedStockData();
+    return Stock.hashPassword(password).then(password =>
+      Stock.create({
+        username,
+        password,
+        user,
+        stocks
+      })
+    );
   	});
 
   	afterEach(function() {
@@ -60,7 +68,18 @@ describe('Stock Tracker API', function() {
 		return closeServer();
 	});
 
+	const token = jwt.sign({
+        user: {
+          username
+        },
+      }, JWT_SECRET, {
+        algorithm: 'HS256',
+        subject: username,
+        expiresIn: '7d'
+      });
+
 	describe('GET endpoint', function() {
+		
 
 		it('should return stock info for specified user', function() {
 			let stockItem;
@@ -70,6 +89,7 @@ describe('Stock Tracker API', function() {
 	      	.then(function(res){
 	      		return chai.request(app)
 	            .get(`/api/stocks/${res.username}`)
+	            .set('authorization', `Bearer ${token}`)
 	        })
 	        .then(function(res){
 	        	res.should.have.status(200);
@@ -100,6 +120,7 @@ describe('Stock Tracker API', function() {
 	      		symbol = res.stocks[0].symbol;
 	      		return chai.request(app)
 	            .get(`/api/stocks/quotes/${symbol}`)
+	         	.set('authorization', `Bearer ${token}`)
 	        })
 	        .then(function(res){
 	        	res.should.have.status(200);
@@ -120,11 +141,13 @@ describe('Stock Tracker API', function() {
 	      	.then(function(res){
 	      		return chai.request(app)
 	            .get(`/api/stocks/quotes/${res.stocks[0].symbol}`)
+	            .set('authorization', `Bearer ${token}`)
 	        })
 	        .then(function(res) {
 	        	result = res.body.quotes.quote;
 	        	return chai.request(app)
 	        	.get(`/api/stocks/search/${result.description.substring(0,3)}`)
+	        	.set('authorization', `Bearer ${token}`)
 	        })
 	        .then(function(res) {
 	        	let isMatch = false;
@@ -162,6 +185,7 @@ describe('Stock Tracker API', function() {
 	      		updateData.username = res.username;
 	      		return chai.request(app)
 	            .put('/api/stocks/addcompany')
+	            .set('authorization', `Bearer ${token}`)
 	            .send(updateData);
 	        })
 	        .then(function(res){
@@ -186,6 +210,7 @@ describe('Stock Tracker API', function() {
 	      		updateData.symbol = res.stocks[0].symbol;
 	      		return chai.request(app)
 	      		.put('/api/stocks/editUnits')
+	      		.set('authorization', `Bearer ${token}`)
 	      		.send(updateData)
 	      	})
 	      	.then(function(res) {

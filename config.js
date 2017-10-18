@@ -11,3 +11,5 @@ exports.HEADERS = {
 	Accept: 'application/json',
 	Authorization: 'Bearer Ab4MdFXCigOZKOnAXImXMOsti9k1',
 };
+exports.JWT_SECRET = process.env.JWT_SECRET || 'stockscapstone';
+exports.JWT_EXPIRY = process.env.JWT_EXPIRY || '7d';

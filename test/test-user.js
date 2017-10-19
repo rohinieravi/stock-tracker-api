@@ -322,7 +322,6 @@ describe('/api/user', function() {
             user
           })
           .then(res => {
-            console.log(res.body);
             expect(res).to.have.status(201);
             expect(res.body).to.be.an('object');
             expect(res.body).to.have.keys('username', 'name', 'stocks');
@@ -358,7 +357,6 @@ describe('/api/user', function() {
             expect(res).to.have.status(201);
             expect(res.body).to.be.an('object');
             expect(res.body).to.have.keys('username', 'name', 'stocks');
-            console.log(res.body);
             expect(res.body.username).to.equal(username);
             expect(res.body.name).to.contain(user.firstName);
             expect(res.body.name).to.contain(user.lastName);

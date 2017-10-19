@@ -130,6 +130,28 @@ app.put('/api/stocks/editUnits',
   .catch(err => res.status(500).json({message: 'Internal server error'}));
 });
 
+app.put('/api/stocks/removecompany',
+    passport.authenticate('jwt', {session: false}),
+    (req, res) => {
+  const requiredFields = ['username', 'symbol'];
+  for (let i=0; i<requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (!(field in req.body)) {
+      const message = `Missing ${field} in request body`
+      console.error(message);
+      return res.status(400).send(message);
+    }
+  }
+  Stock.update({'username': req.body.username}, 
+    {$pull: {'stocks': { 'symbol': req.body.symbol }}})
+  .exec()
+  .then(stock => res.status(204).end())
+  .catch(err => {
+    console.log(err);
+    return res.status(500).json({message: 'Internal server error'})
+  });
+});
+
 app.use('*', (req, res) => {
   return res.status(404).json({message: 'Not Found'});
 });

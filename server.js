@@ -102,12 +102,31 @@ app.put('/api/stocks/addcompany',
       console.error(message);
       return res.status(400).send(message);
     }
+
+    Stock
+      .findOne({username: req.body.username})
+      .exec()
+      .then(function(result){
+        console.log(result);
+          const isExisting = result.stocks.find(field => field.symbol === req.body.stock.symbol);
+          if(isExisting) {
+            Stock.update({'username': req.body.username,'stocks.symbol': req.body.stock.symbol}, 
+              {$set: {'stocks.$.units': req.body.stock.units}})
+            .exec()
+            .then(stock => res.status(204).end())
+            .catch(err => res.status(500).json({message: 'Internal server error'}));
+          }
+          else {
+            Stock
+              .findOneAndUpdate({username: req.body.username}, {$push:{stocks: req.body.stock}},{new: true})
+              .exec()
+              .then(stock => res.json(stock.apiRepr()))
+              .catch(err => res.status(500).json({message: 'Internal server error'}));
+          }
+
+      })
   
-   Stock
-    .findOneAndUpdate({username: req.body.username}, {$push:{stocks: req.body.stock}},{new: true})
-    .exec()
-    .then(stock => res.json(stock.apiRepr()))
-    .catch(err => res.status(500).json({message: 'Internal server error'}));
+   
 });
 
 

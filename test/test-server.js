@@ -217,6 +217,24 @@ describe('Stock Tracker API', function() {
 	      		res.should.have.status(204);
 	      	})
 		});
+
+		it('should remove company from stocks', function() {
+			const updateData = {};
+			return Stock
+	      	.findOne()
+	      	.exec()
+	      	.then(function(res){
+	      		updateData.username = res.username;
+	      		updateData.symbol = res.stocks[0].symbol;
+	      		return chai.request(app)
+	      		.put('/api/stocks/removecompany')
+	      		.set('authorization', `Bearer ${token}`)
+	      		.send(updateData)
+	      	})
+	      	.then(function(res) {
+	      		res.should.have.status(204);
+	      	})
+		});
 	});
 	
 });

@@ -195,6 +195,16 @@ describe('Stock Tracker API', function() {
 		        const length = res.body.stocks.length - 1;
 		        res.body.stocks[length].symbol.should.equal(updateData.stock.symbol);
 		        res.body.stocks[length].units.should.equal(updateData.stock.units);
+
+		        updateData.stock.units = 40;
+		        return chai.request(app)
+		        .put('/api/stocks/addcompany')
+	            .set('authorization', `Bearer ${token}`)
+	            .send(updateData);
+
+	        })
+	        .then(function(res) {
+	        	res.should.have.status(204);
 	        })
 		});
 

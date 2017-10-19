@@ -5,7 +5,7 @@ mongoose.Promise = global.Promise;
 
 
 const stockSchema = mongoose.Schema({
-  username: {type: String, required: true},
+  username: {type: String, required: true, unique: true},
   password: {type: String, required: true},
   user:{
     firstName: {type:String, default:""},

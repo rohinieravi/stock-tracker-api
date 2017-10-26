@@ -95,7 +95,7 @@ app.get('/api/stocks/search/:keyword',
 app.put('/api/stocks/addcompany',
     passport.authenticate('jwt', {session: false}),
     (req, res) => {
-  
+    console.log(req.body);
     const field = 'username';
     if (!(field in req.body)) {
       const message = `Missing ${field} in request body`
@@ -107,7 +107,6 @@ app.put('/api/stocks/addcompany',
       .findOne({username: req.body.username})
       .exec()
       .then(function(result){
-        console.log(result);
           const isExisting = result.stocks.find(field => field.symbol === req.body.stock.symbol);
           if(isExisting) {
             Stock.update({'username': req.body.username,'stocks.symbol': req.body.stock.symbol}, 

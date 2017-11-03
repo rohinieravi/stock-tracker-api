@@ -1,7 +1,6 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const jwt = require('jsonwebtoken');
-
 const {app, runServer, closeServer} = require('../server');
 const {Stock} = require('../models');
 const {JWT_SECRET, TEST_DATABASE_URL} = require('../config');
@@ -11,7 +10,6 @@ const expect = chai.expect;
 
 // This let's us make HTTP requests
 // in our tests.
-// see: https://github.com/chaijs/chai-http
 chai.use(chaiHttp);
 
 
@@ -47,7 +45,9 @@ describe('/api/user', function() {
   });
 
   describe('/api/users', function() {
+
     describe('POST', function() {
+
       it('Should reject users with missing username', function() {
         return chai.request(app)
           .post('/api/users')
@@ -68,6 +68,7 @@ describe('/api/user', function() {
             expect(res.body.location).to.equal('username');
           });
       });
+
       it('Should reject users with missing password', function() {
         return chai.request(app)
           .post('/api/users')
@@ -88,6 +89,7 @@ describe('/api/user', function() {
             expect(res.body.location).to.equal('password');
           });
       });
+
       it('Should reject users with non-string username', function() {
         return chai.request(app)
           .post('/api/users')
@@ -109,6 +111,7 @@ describe('/api/user', function() {
             expect(res.body.location).to.equal('username');
           });
       });
+
       it('Should reject users with non-string password', function() {
         return chai.request(app)
           .post('/api/users')
@@ -122,7 +125,6 @@ describe('/api/user', function() {
             if (err instanceof chai.AssertionError) {
               throw err;
             }
-
             const res = err.response;
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
@@ -130,6 +132,7 @@ describe('/api/user', function() {
             expect(res.body.location).to.equal('password');
           });
       });
+
       it('Should reject users with non-string first name', function() {
         return chai.request(app)
           .post('/api/users')
@@ -154,6 +157,7 @@ describe('/api/user', function() {
             expect(res.body.location).to.equal('user');
           });
       });
+
       it('Should reject users with non-string last name', function() {
         return chai.request(app)
           .post('/api/users')
@@ -170,7 +174,6 @@ describe('/api/user', function() {
             if (err instanceof chai.AssertionError) {
               throw err;
             }
-
             const res = err.response;
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
@@ -178,6 +181,7 @@ describe('/api/user', function() {
             expect(res.body.location).to.equal('user');
           });
       });
+
       it('Should reject users with non-trimmed username', function() {
         return chai.request(app)
           .post('/api/users')
@@ -191,7 +195,6 @@ describe('/api/user', function() {
             if (err instanceof chai.AssertionError) {
               throw err;
             }
-
             const res = err.response;
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
@@ -199,6 +202,7 @@ describe('/api/user', function() {
             expect(res.body.location).to.equal('username');
           });
       });
+
       it('Should reject users with non-trimmed password', function() {
         return chai.request(app)
           .post('/api/users')
@@ -212,7 +216,6 @@ describe('/api/user', function() {
             if (err instanceof chai.AssertionError) {
               throw err;
             }
-
             const res = err.response;
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
@@ -220,6 +223,7 @@ describe('/api/user', function() {
             expect(res.body.location).to.equal('password');
           });
       });
+
       it('Should reject users with empty username', function() {
         return chai.request(app)
           .post('/api/users')
@@ -233,7 +237,6 @@ describe('/api/user', function() {
             if (err instanceof chai.AssertionError) {
               throw err;
             }
-
             const res = err.response;
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
@@ -241,6 +244,7 @@ describe('/api/user', function() {
             expect(res.body.location).to.equal('username');
           });
       });
+
       it('Should reject users with password less than ten characters', function() {
         return chai.request(app)
           .post('/api/users')
@@ -254,7 +258,6 @@ describe('/api/user', function() {
             if (err instanceof chai.AssertionError) {
               throw err;
             }
-
             const res = err.response;
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
@@ -262,6 +265,7 @@ describe('/api/user', function() {
             expect(res.body.location).to.equal('password');
           });
       });
+
       it('Should reject users with password greater than 72 characters', function() {
         return chai.request(app)
           .post('/api/users')
@@ -275,7 +279,6 @@ describe('/api/user', function() {
             if (err instanceof chai.AssertionError) {
               throw err;
             }
-
             const res = err.response;
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
@@ -283,6 +286,7 @@ describe('/api/user', function() {
             expect(res.body.location).to.equal('password');
           });
       });
+
       it('Should reject users with duplicate username', function() {
         // Create an initial user
         return Stock.create({
@@ -305,7 +309,6 @@ describe('/api/user', function() {
           if (err instanceof chai.AssertionError) {
             throw err;
           }
-
           const res = err.response;
           expect(res).to.have.status(422);
           expect(res.body.reason).to.equal('ValidationError');
@@ -313,6 +316,7 @@ describe('/api/user', function() {
           expect(res.body.location).to.equal('username');
         });
       });
+
       it('Should create a new user', function() {
         return chai.request(app)
           .post('/api/users')
@@ -342,6 +346,7 @@ describe('/api/user', function() {
             expect(passwordIsCorrect).to.be.true;
           });
       });
+      
       it('Should trim firstName and lastName', function() {
         return chai.request(app)
           .post('/api/users')

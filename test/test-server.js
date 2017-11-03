@@ -6,21 +6,11 @@ const faker = require('faker');
 const {TEST_DATABASE_URL, JWT_SECRET} = require('../config');
 const jwt = require('jsonwebtoken');
 const {app, runServer, closeServer} = require('../server');
-
 const should = chai.should();
+
 chai.use(chaiHttp);
 
 
-/*function seedStockData(){
-	const seedData = [];
-  	for (let i=1; i<=10; i++) {
-    	seedData.push(generateStockData());
-  	}
-  	return Stock.insertMany(seedData);
-}*/
-
-//function generateStockData() {
-	//return {
 const username = faker.internet.email();
 const password = "examplePassword";
 const user = {
@@ -35,7 +25,8 @@ const stocks = [{
 		{
 			symbol: "TSLA",
 			units: faker.random.number()
-		}];
+		}
+];
 	
 
 
@@ -50,6 +41,7 @@ describe('Stock Tracker API', function() {
 	});
 
 	beforeEach(function() {
+	//creates dummy user
     return Stock.hashPassword(password).then(password =>
       Stock.create({
         username,
@@ -89,7 +81,7 @@ describe('Stock Tracker API', function() {
 	      	.then(function(res){
 	      		return chai.request(app)
 	            .get(`/api/stocks/${res.username}`)
-	            .set('authorization', `Bearer ${token}`)
+	            .set('authorization', `Bearer ${token}`) //sending JWT token
 	        })
 	        .then(function(res){
 	        	res.should.have.status(200);
@@ -181,7 +173,6 @@ describe('Stock Tracker API', function() {
 	      	.findOne()
 	      	.exec()
 	      	.then(function(res){
-	      		//console.log(res.body);
 	      		updateData.username = res.username;
 	      		return chai.request(app)
 	            .put('/api/stocks/addcompany')

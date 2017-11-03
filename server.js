@@ -19,19 +19,20 @@ app.use(bodyParser.json());
 
 mongoose.Promise = global.Promise;
 
+//enables CORS
 app.use(
     cors({
         origin: CLIENT_ORIGIN
     })
 );
 
+//uses passport for authentication
 app.use(passport.initialize());
 passport.use(basicStrategy);
 passport.use(jwtStrategy);
 
 app.use('/api/users/', userRouter);
 app.use('/api/auth/', authRouter);
-
 
 app.get('/api/stocks/:username', 
       passport.authenticate('jwt', {session: false}),
@@ -47,7 +48,6 @@ app.get('/api/stocks/:username',
       res.status(500).json({error: 'something went terribly wrong'});
     });
 });
-
 
 app.get('/api/stocks/quotes/:symbol',
     passport.authenticate('jwt', {session: false}), 
@@ -102,7 +102,6 @@ app.put('/api/stocks/addcompany',
       console.error(message);
       return res.status(400).send(message);
     }
-
     Stock
       .findOne({username: req.body.username})
       .exec()
@@ -124,10 +123,7 @@ app.put('/api/stocks/addcompany',
           }
 
       })
-  
-   
 });
-
 
 app.put('/api/stocks/editUnits',
     passport.authenticate('jwt', {session: false}),
@@ -174,9 +170,7 @@ app.use('*', (req, res) => {
   return res.status(404).json({message: 'Not Found'});
 });
 
-
 let server;
-
 
 function runServer(databaseUrl=DATABASE_URL, port=PORT) {
   return new Promise((resolve, reject) => {

@@ -3,11 +3,9 @@ const {BasicStrategy} = require('passport-http');
 const {
     // Assigns the Strategy export to the name JwtStrategy using object
     // destructuring
-    // https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment#Assigning_to_new_variable_names
     Strategy: JwtStrategy,
     ExtractJwt
 } = require('passport-jwt');
-
 const {Stock} = require('./models');
 const {JWT_SECRET} = require('./config');
 

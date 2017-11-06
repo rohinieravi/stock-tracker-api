@@ -49,7 +49,7 @@ app.get('/api/stocks/:username',
     });
 });
 
-app.get('/api/stocks/quotes/:symbol',
+app.get('/api/stocks/quotes/:symbol(*)',
     passport.authenticate('jwt', {session: false}), 
     (req, res) => {
   if (!req.params.symbol) { 

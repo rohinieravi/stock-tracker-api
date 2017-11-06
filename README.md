@@ -81,3 +81,6 @@ Failure: Returns status code 500 with error message if the post failed.
 * Mocha, Chai and Chai HTTP
 * Mongoose, MLAB
 
+## External API:
+* <a href="https://developer.tradier.com/documentation">Tradier</a>
+
